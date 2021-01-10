@@ -29,11 +29,10 @@ function getPokemon() {
 		.then((data) => formatPokemon(data));
 }
 
-function getState() {
-	return Promise.all([getPokemon(), getPokemon()]).then((values) => {
-		return {
-			position: 0,
-			pokemons: values,
-		};
-	});
+async function getState() {
+	const pokemons = await Promise.all([getPokemon(), getPokemon()]);
+	return {
+		position: 0,
+		pokemons: pokemons,
+	};
 }
