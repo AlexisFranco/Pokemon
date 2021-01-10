@@ -1,76 +1,39 @@
-const state = {
-	position: 0,
-	pokemons: [
-		{
-			name: 'ivysaur',
-			artwork:
-				'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/2.png',
-			health: {
-				current: 60,
-				initial: 60,
-				bar: 'green',
-			},
-			types: [
-				{
-					name: 'grass',
-				},
-				{
-					name: 'poison',
-				},
-			],
-			moves: [
-				{
-					name: 'swords-dance',
-				},
-				{
-					name: 'cut',
-				},
-				{
-					name: 'bind',
-				},
-				{
-					name: 'vine-whip',
-				},
-			],
-			_ui: {
-				container: null,
-				bar: null,
-				health: null,
-			},
+function formatPokemon(data = {}) {
+	return {
+		name: data.name,
+		artwork: data.sprites.other['official-artwork'].front_default,
+		health: {
+			current: data.stats[0].base_stat,
+			initial: data.stats[0].base_stat,
+			bar: 'green',
 		},
-		{
-			name: 'charmeleon',
-			artwork:
-				'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/5.png',
-			health: {
-				current: 58,
-				initial: 58,
-				bar: 'green',
-			},
-			types: [
-				{
-					name: 'fire',
-				},
-			],
-			moves: [
-				{
-					name: 'mega-punch',
-				},
-				{
-					name: 'fire-punch',
-				},
-				{
-					name: 'thunder-punch',
-				},
-				{
-					name: 'scratch',
-				},
-			],
-			_ui: {
-				container: null,
-				bar: null,
-				health: null,
-			},
+		types: data.types.map((item) => /* ({ name: item.type.name })*/ {
+			return {
+				name: item.type.name,
+			};
+		}),
+		moves: data.moves.slice(0, 4).map((item) => ({ name: item.move.name })),
+		_ui: {
+			container: null,
+			bar: null,
+			health: null,
 		},
-	],
-};
+	};
+}
+
+function getPokemon() {
+	const id = getRandomNumber(150);
+	const url = `https://pokeapi.co/api/v2/pokemon/${id}`;
+	return fetch(url)
+		.then((response) => response.json())
+		.then((data) => formatPokemon(data));
+}
+
+function getState() {
+	return Promise.all([getPokemon(), getPokemon()]).then((values) => {
+		return {
+			position: 0,
+			pokemons: values,
+		};
+	});
+}
